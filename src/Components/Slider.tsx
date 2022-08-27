@@ -8,20 +8,9 @@ import { faSquareCaretLeft, faSquareCaretRight } from '@fortawesome/free-solid-s
 import Detail from "./Detail";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { Volume } from "../recoil";
+import { isSoundAtom } from "../recoil";
 
-const Container = styled(motion.div)`
-  position: relative;
-  bottom: 150px;
-  width: 100%;
-  &:nth-child(1) {
-    margin-top: 100px;
-  }
-  &:nth-child(2) {
-    margin-top: 700px;
-  }
 
-`;
 const Row = styled(motion.div)`
   display: grid;
   grid-template-columns: 50px 1fr 1fr 1fr 1fr 1fr 1fr 50px;
@@ -109,7 +98,6 @@ const infoVariants ={
   }
 }
 
-
 export interface ISliderProps{
   data:IData[];
   category:string;
@@ -118,12 +106,12 @@ export interface ISliderProps{
 
 const offset = 6;
 export default function Slider({data, kind, category}:ISliderProps  ) {
-  const [isVolume, setVolume] = useRecoilState(Volume)
+  const [isSound, setSound] = useRecoilState(isSoundAtom)
   const history = useHistory();
   const onBoxClicked = (id:number, kind:string, category:string) => {
     //if(search) history.push(`/search/${kind}/${id}`)
      history.push(`/${kind}/${category}/${id}`)
-     setVolume(true)
+     setSound(true)
   }
   const [index, setIndex] = useState(0);
   const [increasing, setIncreasing] = useState(true);

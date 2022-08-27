@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import {  getLatestMovies, getNowPlayingMovies, getTopRatedMoives, getUpcomingMovies, getVideoFunc } from "../api";
-import { makeImagePath, makeMoviePath } from "../utils";
+import {  makeMoviePath } from "../utils";
 import Slider from "../Components/Slider";
-import { category, isSoundAtom, SoundEnums, Volume } from "../recoil";
+import { category, isSoundAtom} from "../recoil";
 import ReactPlayer from "react-player";
-import React, { useCallback } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import React  from "react";
+import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 /*{
   "iso_639_1": "en",
@@ -24,7 +24,7 @@ import { motion } from "framer-motion";
 1.설치:npm install react-player > import ReactPlayer from "react-player";
  - "react-player/youtube": 한 가지 유형만 사용하는 경우 유형까지 적어주면 번들 크기를 줄여서 import 
 2.🔑영상key 얻기
-  export const getMoviesTrailer = async (movieId?: string) => {
+  export const getVideoFunc = async (movieId?: string) => {
   const response = await fetch(
     `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}`
   );
@@ -94,7 +94,7 @@ const PlayerWrapper = styled.div`
     left:0;
   }
 `
-const PlayBtn = styled(motion.button)`
+const PlayBtn = styled.button`
   font-size: 15px;
   height: 30px;
   border-radius: 5px;
@@ -180,18 +180,12 @@ export default function Home() {
   //Button type attribute has not been set
   const {data:VideoData, isLoading:VideoLoading} = useQuery<IMovieVideo>(
     ["MovieVideo","VIDEO" ],() => getVideoFunc(String(619803)))  
-  const isVolume = useRecoilValue(Volume);
-  const [isSound, setIsSound] = useRecoilState<SoundEnums>(isSoundAtom);
-  const { OFF, ON } = SoundEnums;
-  const handleChangeSound = useCallback((): void => {
-    if (isSound === OFF ) {
-      localStorage.setItem("sound", ON);
-      setIsSound(ON)
-      return;
-    }
-    localStorage.setItem("sound", OFF);
-    setIsSound(OFF);
-  }, [OFF, ON, isSound, setIsSound])
+
+  const [isSound, setIsSound] = useRecoilState(isSoundAtom);
+
+  const handleChangeSound = () => {
+    setIsSound((prev) => !prev)
+  }
 
       return (
       <Wrapper>
@@ -203,9 +197,9 @@ export default function Home() {
             <ReactPlayer
               className="react-player"
               url={makeMoviePath(VideoData?.results[0].key || "" )}
-              volume={isVolume ? 0 : 0.3 }
-              muted={true}
-              controls={false}
+              volume={isSound ? 0 : 2 }
+              muted={true} //자동 재생 Y / N
+              controls={true}
               playing={true}
               width="100vw"
               height="calc(110vh)"
@@ -215,7 +209,7 @@ export default function Home() {
             >
             </ReactPlayer>
           </PlayerWrapper>  
-          <PlayBtn type="submit"  onClick={handleChangeSound}>
+          <PlayBtn type="button" onClick={() => handleChangeSound()}>
               {isSound ? "Sound ON" : "Sound OFF" }
           </PlayBtn>  
           <SliderWrapper>

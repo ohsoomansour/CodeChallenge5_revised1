@@ -1,15 +1,13 @@
 import styled  from "styled-components";
 import {AnimatePresence, motion, useViewportScroll} from "framer-motion";
-import { makeImagePath } from "../utils";
+import { makeImagePath, makeMoviePath } from "../utils";
 import { useQuery } from "react-query";
-import { getDetail } from "../api";
-import { useHistory } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-import { Volume } from "../recoil";
-
-
-//translate3d(x,y,z):	현재의 위치에서 해당 요소를 주어진 x축, y축과 z축의 거리만큼 이동시킴.
-
+import { getDetail, getTvStream, getVideoFunc } from "../api";
+import { useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { isSoundAtom } from "../recoil";
+import ReactPlayer from "react-player";
+import { IMovieVideo } from "../Router/Home";
 
 const BigMovie = styled(motion.div)`
   position: absolute;
@@ -45,7 +43,18 @@ const BigTitle = styled.h3`
   position: relative; 
   top:800px;
 `;
-
+const PlayerWrapper = styled.div`
+  position:relative;
+  display:flex;
+  jusify-content:center;
+  top:850px;
+  padding-top: 56.25%
+  .react-player{
+    position:absolute;
+    left:0;
+    right:0;
+  }
+`
 const BigOverview = styled.p`
   font-size:20px;
   line-height:1.5;
@@ -66,7 +75,6 @@ export interface IDetailProps {
   kind:string;
   category:string;
 }
-
 
 export interface IDetailDatas{
   backdrop_path:string;
@@ -108,19 +116,42 @@ const OverlayVariants = {
     opacity:0
   }
 }
+
+/*useRoutematch로 movieId를 가져와서 영상을 보여주도록  : Home > slider > Detail 경로로 props를 전달 
+  > isExact: true
+    params: {movieId: '438148'}
+    path: "/movie/nowPlaying-Moive/:movieId"
+    url: "/movie/nowPlaying-Moive/438148"
+*/
+interface IMovieMatch{
+  movieId:string;
+}
+interface ITvMatch{
+  tvId:string;
+}
 export default function Detail({id, kind, category}:IDetailProps) {
-  const setVolume = useSetRecoilState(Volume)
-  const { scrollY, scrollX } = useViewportScroll()
+  const movieIdMatch = useRouteMatch<IMovieMatch>(`/${kind}/${category}/:movieId`)
+  const tvIdMatch = useRouteMatch< ITvMatch>(`/${kind}/${category}/:tvId`)
+  console.log(id, tvIdMatch)
+  const {data:movieVideoData} = useQuery<IMovieVideo>(
+  ["movieVideo", "Video"], () => getVideoFunc(movieIdMatch?.params.movieId))
+  const {data: TvStreamData } = useQuery<IMovieVideo>(
+    ["TvStream","Tv"], () => getTvStream(id+"")) //⭐string 또는 undefined이 될 수 있는 tvId는 왼쪽과 같이 반드시 표현, 그렇지 않으면 에러발생!
+  //console.log(TvStreamData)
+  const [isSound, setIsSound] = useRecoilState(isSoundAtom);
+  
+  const setSound = useSetRecoilState(isSoundAtom)
+  const { scrollY  } = useViewportScroll()
   const history = useHistory();
   const onOverlayClick = () => {
     history.goBack();
-    setVolume(false); //오버레이off시 '홈 화면' 볼륨 0.3
+    setSound(false); //오버레이off시 '홈 화면' 볼륨 0.3
   }
   const {data, isLoading} = useQuery<IDetailDatas>(
     ["Detail",kind, id ],
     () => getDetail(kind, id)
-    )
-  console.log(data)
+  )
+
   return (
     <AnimatePresence>
     <>
@@ -150,7 +181,23 @@ export default function Detail({id, kind, category}:IDetailProps) {
               <BigTitle>{data.title}</BigTitle>
               <BigOverview>{data.overview}</BigOverview>
               <TagLine>{data.tagline}</TagLine>
-              
+              <PlayerWrapper>
+              <ReactPlayer
+                className="react-player"
+                url={makeMoviePath(movieVideoData?.results[0].key|| TvStreamData?.results[0].key)}
+                
+                volume={isSound ? 0 : 2 }
+                muted={true} 
+                controls={true}
+                playing={true}
+                width="calc(80vw)"
+                height="calc(30vh)"
+                pip={false}
+                light={false}
+                loop={true}
+                >
+              </ReactPlayer>
+            </PlayerWrapper>  
             </BigCover>
           </>
           )}

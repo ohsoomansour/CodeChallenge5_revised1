@@ -87,13 +87,24 @@ export function getMultiSearch({params}:IMultiSearch){
     (repsponse) => repsponse.json()
   )
 }
+
+//샘플1:https://api.themoviedb.org/3/movie/438148/videos?api_key=e7a6b4de55b190b9bd44f056560c7e68
+//샘플2:https://api.themoviedb.org/3/movie/129/videos?api_key=e7a6b4de55b190b9bd44f056560c7e68
 export const getVideoFunc = async(movieId?:string) => {
   const json = await(
     await fetch (`${BASE_PATH}/movie/${movieId}/videos?api_key=${API_KEY}`))
     .json();
   return json
 }
+//샘플1: https://api.themoviedb.org/3/tv/90521/videos?api_key=e7a6b4de55b190b9bd44f056560c7e68
+//샘플2: https://api.themoviedb.org/3/tv/155226/videos?api_key=e7a6b4de55b190b9bd44f056560c7e68
+//샘플3: https://api.themoviedb.org/3/tv/66370/videos?api_key=e7a6b4de55b190b9bd44f056560c7e68
 
+export function getTvStream(tvId?:string) {
+  return fetch(`${BASE_PATH}/tv/${tvId}/api_key=${API_KEY}`).then(
+    (reponse) => reponse.json()
+  )
+}
 
 /*
 {

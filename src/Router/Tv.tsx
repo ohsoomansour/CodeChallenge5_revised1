@@ -49,13 +49,12 @@ const SliderTitle = styled.p`
 export default function Tv() {
   const {data:airingTodayData, isLoading:airingTodayLoading} = useQuery<IGetDataResult>(
     ["AiringToday", "TV"], getAiringTodayShowTv)
-
+  
   const airingTodayDatas = airingTodayLoading
     ? []
     : airingTodayData
     ? airingTodayData.results
     : [];
-
   const {data:PopularTodayData, isLoading:PopularTodayLoading} = useQuery<IGetDataResult>(  
   ["PopluarShow", "TV"], getPopularShowTv)
   const PopularTodayDatas = PopularTodayLoading

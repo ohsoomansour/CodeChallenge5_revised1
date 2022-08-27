@@ -1,3 +1,4 @@
+import { faAnglesDown } from "@fortawesome/free-solid-svg-icons";
 import {atom} from "recoil";
 
 export enum category {
@@ -16,26 +17,8 @@ export const SearchAtom = atom({
   default:""
 })
 
-export const Volume = atom({
-  key:"volume",
-  default:false
-})
-
-export enum SoundEnums{
-  OFF = "0",
-  ON = "1",
-}
-export const getSound = (): SoundEnums => {
-  const sound = localStorage.getItem("sound");
-  if (sound === OFF) {
-    return OFF;
-  }
-  return ON;
-};
-
-const { OFF, ON } = SoundEnums;
 export const isSoundAtom = atom({
   key:"soundSwitch",
-  default:getSound()
+  default: false,
 })
 

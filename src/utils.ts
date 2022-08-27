@@ -9,7 +9,8 @@
   export function makeImagePath(id:string | undefined, format?:string) {
   return `https://image.tmdb.org/t/p/${format? format : "original"}${id}`
  }
-
+//tvairing 2번 째 샘플:https://www.youtube.com/embed/l-MqNftE0BY
+//https://www.youtube.com/embed/W5szC4XgR1s
  export function makeMoviePath(key?:string) {
   return `https://www.youtube.com/embed/${key}`
  }
